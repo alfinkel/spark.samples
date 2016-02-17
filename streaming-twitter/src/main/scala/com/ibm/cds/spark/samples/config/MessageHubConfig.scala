@@ -138,10 +138,10 @@ object MessageHubConfig{
       try{
         val confString = """KafkaClient {
                            |     com.ibm.messagehub.login.MessageHubLoginModule required
-                           |     serviceName="messagehub-spark"
+                           |     serviceName="kafka"
                            |     username="$USERNAME"
                            |     password="$PASSWORD";
-                           | };""".replace("$USERNAME", userName).replace("$PASSWORD", password)
+                           |};""".replace("$USERNAME", userName).replace("$PASSWORD", password)
         
         val confDir= new File( System.getProperty("java.io.tmpdir") + File.separator + 
             fixPath( userName ) )
