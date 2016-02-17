@@ -135,13 +135,13 @@ object MessageHubConfig{
   
   def createJaasConfiguration( userName: String, password: String){
     //Create the jaas configuration
-      var is:InputStream = null
       try{
-        val packageName = MessageHubConfig.getClass.getPackage.getName.replace('.', File.separatorChar)
-        is = MessageHubConfig.getClass.getClassLoader.getResourceAsStream(packageName + "/jaas.conf");
-        val confString = Source.fromInputStream( is ).mkString
-          .replace( "$USERNAME", userName)
-          .replace( "$PASSWORD", password )
+        val confString = """KafkaClient {
+                           |     com.ibm.messagehub.login.MessageHubLoginModule required
+                           |     serviceName="messagehub-spark"
+                           |     username="$USERNAME"
+                           |     password="$PASSWORD";
+                           | };""".replace("$USERNAME", userName).replace("$PASSWORD", password)
         
         val confDir= new File( System.getProperty("java.io.tmpdir") + File.separator + 
             fixPath( userName ) )
@@ -159,8 +159,37 @@ object MessageHubConfig{
           e.printStackTrace
           throw e
         }        
-      }finally{
-        if ( is != null ) is.close
       }
   }
+
+  // def createJaasConfiguration( userName: String, password: String){
+     //Create the jaas configuration
+  //     var is:InputStream = null
+  //     try{
+  //       val packageName = MessageHubConfig.getClass.getPackage.getName.replace('.', File.separatorChar)
+  //       is = MessageHubConfig.getClass.getClassLoader.getResourceAsStream(packageName + "/jaas.conf");
+  //       val confString = Source.fromInputStream( is ).mkString
+  //         .replace( "$USERNAME", userName)
+  //         .replace( "$PASSWORD", password )
+        
+  //       val confDir= new File( System.getProperty("java.io.tmpdir") + File.separator + 
+  //           fixPath( userName ) )
+  //       confDir.mkdirs
+  //       val confFile = new File( confDir, "jaas.conf");
+  //       val fw = new FileWriter( confFile );
+  //       fw.write( confString )
+  //       fw.close
+        
+  //       //Set the jaas login config property
+  //       println("Registering JaasConfiguration: " + confFile.getAbsolutePath)
+  //       System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, confFile.getAbsolutePath )
+  //     }catch{
+  //       case e:Throwable => {
+  //         e.printStackTrace
+  //         throw e
+  //       }        
+  //     }finally{
+  //       if ( is != null ) is.close
+  //     }
+  // }
 }
